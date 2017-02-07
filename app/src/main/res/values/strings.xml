@@ -19,10 +19,15 @@
     <string name="hint_item_name">Enter Item Name</string>
 
     <!--Button Text-->
-    <string name="delete_item">Delete Item</string>
-    <string name="order">Order More</string>
+    <string name="delete_item_button">Delete Item</string>
+    <string name="order_button">Order More</string>
     <string name="image_button">Insert Image</string>
     <string name="shipment_button">Order Received</string>
+    <string name="save_button">Save</string>
+
+    <!--Menu Text-->
+    <string name="menu_remove_all">Remove All</string>
+    <string name="menu_insert_sample">Insert</string>
 
 
 </resources>
