@@ -1,4 +1,28 @@
 <resources>
     <string name="app_name">InventoryApp</string>
     <string name="action_settings">Settings</string>
+
+    <!--Category Strings-->
+    <string name="item_name">Item Name</string>
+    <string name="supplier_name">Supplier Name</string>
+    <string name="supplier_email">Supplier Email</string>
+    <string name="stock">Quantity In Stock</string>
+    <string name="price">Price</string>
+    <string name="image">Image</string>
+    <string name="sale_button">Sale</string>
+
+    <!--Hint Text-->
+    <string name="hint_item_name">Enter Item Name</string>
+    <string name="hint_supplier_name">Enter Supplier Name</string>
+    <string name="hint_supplier_email">Enter Supplier Email</string>
+    <string name="hint_price">Enter Price</string>
+    <string name="hint_item_name">Enter Item Name</string>
+
+    <!--Button Text-->
+    <string name="delete_item">Delete Item</string>
+    <string name="order">Order More</string>
+    <string name="image_button">Insert Image</string>
+    <string name="shipment_button">Order Received</string>
+
+
 </resources>
