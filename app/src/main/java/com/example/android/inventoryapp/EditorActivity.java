@@ -47,6 +47,8 @@ public class EditorActivity extends AppCompatActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+
         return null;
     }
 

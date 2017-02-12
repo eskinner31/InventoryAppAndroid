@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">InventoryApp</string>
     <string name="action_settings">Settings</string>
+    <string name="empty_list_text">Nothing In Inventory</string>
 
     <!--Category Strings-->
     <string name="item_name">Item Name</string>

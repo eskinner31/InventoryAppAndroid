@@ -1,18 +1,21 @@
 package com.example.android.inventoryapp;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.TextView;
 
 import com.example.android.inventoryapp.data.InventoryContract.InventoryEntry;
 
@@ -29,7 +32,8 @@ public class InventoryActivity extends AppCompatActivity implements
     //Views
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.fab) FloatingActionButton mFab;
-    @BindView(R.id.inventory_list_view) RecyclerView mInventoryListView;
+    @BindView(R.id.inventory_list_view) AdapterView mInventoryListView;
+    @BindView(R.id.empty_stock) TextView mEmptyTextView;
 
     //Listeners
     //TODO: ATTEMPT BINDING LISTENERS WITH BUTTERKNIFE ANNOTATIONS
@@ -44,6 +48,11 @@ public class InventoryActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
 
+        mInventoryListView.setEmptyView(mEmptyTextView);
+        mCursorAdapter = new InventoryCursorAdapter(this, null);
+        mInventoryListView.setAdapter(mCursorAdapter);
+
+        //setting up event listeners
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,8 +61,20 @@ public class InventoryActivity extends AppCompatActivity implements
             }
         });
 
-        // TODO: 2/6/17 set up adapter and listeners 
-        // TODO: 2/6/17 set up empty list view 
+        mInventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(InventoryActivity.this, EditorActivity.class);
+
+                Uri currentItemUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
+
+                intent.setData(currentItemUri);
+
+                startActivity(intent);
+            }
+        });
+
+        getSupportLoaderManager().initLoader(INVENTORY_LOADER, null, this);
     }
 
     @Override
@@ -115,6 +136,10 @@ public class InventoryActivity extends AppCompatActivity implements
     }
 
     private void deleteAll() {
+        //DO STUFF
+    }
+
+    private void processSale() {
         //DO STUFF
     }
 }

@@ -31,4 +31,11 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_menu_add" />
 
+    <TextView
+        android:id="@+id/empty_stock"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/empty_list_text"
+        android:gravity="center"/>
+
 </android.support.design.widget.CoordinatorLayout>
