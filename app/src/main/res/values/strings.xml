@@ -17,18 +17,35 @@
     <string name="hint_supplier_name">Enter Supplier Name</string>
     <string name="hint_supplier_email">Enter Supplier Email</string>
     <string name="hint_price">Enter Price</string>
-    <string name="hint_item_name">Enter Item Name</string>
 
     <!--Button Text-->
     <string name="delete_item_button">Delete Item</string>
     <string name="order_button">Order More</string>
-    <string name="image_button">Insert Image</string>
+    <string name="image_button">Insert Image Link</string>
     <string name="shipment_button">Order Received</string>
     <string name="save_button">Save</string>
 
     <!--Menu Text-->
     <string name="menu_remove_all">Remove All</string>
-    <string name="menu_insert_sample">Insert</string>
 
+    <!--Title Text-->
+    <string name="edit_item">Edit Item</string>
+    <string name="add_item">Add Item</string>
+
+    <!--Status Message Text-->
+    <string name="delete_failed">Delete Failure</string>
+    <string name="delete_succeeded">Delete Succeeded</string>
+
+    <string name="update_stock_failed">Update Stock Failed</string>
+    <string name="update_stock_succeeded">Update Stock Succeeded</string>
+
+    <string name="insert_item_failed">Insert Failure</string>
+    <string name="insert_item_succeeded">Insert Success</string>
+
+    <string name="update_failed">Update Failed</string>
+    <string name="update_succeeded">Update Succeeded</string>
+
+    <string name="need_image">Need Image</string>
+    <string name="fill_out_fields_warning">Fill Out All Fields</string>
 
 </resources>

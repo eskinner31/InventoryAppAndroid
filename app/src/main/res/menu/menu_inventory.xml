@@ -4,12 +4,6 @@
     tools:context="com.example.android.inventoryapp.InventoryActivity">
 
     <item
-        android:id="@+id/sample_insert"
-        android:orderInCategory="1"
-        android:title="@string/menu_insert_sample"
-        app:showAsAction="never"/>
-
-    <item
         android:id="@+id/sample_remove_all"
         android:orderInCategory="2"
         android:title="@string/menu_remove_all"

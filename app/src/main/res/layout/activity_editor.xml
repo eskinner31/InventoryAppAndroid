@@ -121,18 +121,19 @@
             android:layout_height="50dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="@string/stock" />
+            android:hint="@string/stock"/>
 
-        <TextView
+        <EditText
             android:id="@+id/stock_edittext"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:inputType="number"/>
 
         <Button
             android:id="@+id/order_received_button"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/shipment_button" />
 
@@ -150,11 +151,12 @@
             android:gravity="center_vertical"
             android:text="@string/image" />
 
-        <Button
-            android:id="@+id/image_button"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/image_link_edittext"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="@string/image_button" />
+            android:hint="@string/image_button" />
 
     </LinearLayout>
 

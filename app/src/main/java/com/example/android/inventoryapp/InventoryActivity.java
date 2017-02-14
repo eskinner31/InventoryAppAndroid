@@ -1,6 +1,7 @@
 package com.example.android.inventoryapp;
 
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,12 +66,23 @@ public class InventoryActivity extends AppCompatActivity implements
         mInventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                Log.v(TAG, view.getTag().toString());
+                Log.v(TAG, "THE VIEW" + view.toString());
+                if(view.getTag() != null) {
+                    int currentQuantity = Integer.parseInt(view.findViewById(R.id.stock_edittext).toString().trim());
+                    int newQuantity = currentQuantity - 1;
+                    Uri currentItemUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
+                    ContentValues values = new ContentValues();
+                    values.put(InventoryEntry.COLUMN_STOCK, newQuantity);
+
+                    getContentResolver().update(currentItemUri, values, null, null);
+
+                }
+
                 Intent intent = new Intent(InventoryActivity.this, EditorActivity.class);
-
                 Uri currentItemUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
-
                 intent.setData(currentItemUri);
-
                 startActivity(intent);
             }
         });
@@ -88,9 +101,6 @@ public class InventoryActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.sample_insert:
-                insertHelperData();
-                return true;
             case R.id.sample_remove_all:
                 deleteAll();
                 return true;
@@ -104,6 +114,7 @@ public class InventoryActivity extends AppCompatActivity implements
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String[] projection = {
+                InventoryEntry._ID,
                 InventoryEntry.COLUMN_ITEM_NAME,
                 InventoryEntry.COLUMN_SUPPLIER_NAME,
                 InventoryEntry.COLUMN_STOCK
@@ -130,16 +141,8 @@ public class InventoryActivity extends AppCompatActivity implements
         mCursorAdapter.swapCursor(null);
     }
 
-
-    private void insertHelperData() {
-        //DO STUFF
-    }
-
     private void deleteAll() {
-        //DO STUFF
-    }
-
-    private void processSale() {
-        //DO STUFF
+        int rowsDeleted = getContentResolver().delete(InventoryEntry.CONTENT_URI, null, null);
+        Log.v(TAG, rowsDeleted + " rows deleted");
     }
 }
