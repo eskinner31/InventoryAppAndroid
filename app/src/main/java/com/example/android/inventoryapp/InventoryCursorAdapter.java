@@ -14,14 +14,13 @@ import android.widget.TextView;
 
 import com.example.android.inventoryapp.data.InventoryContract.InventoryEntry;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 /**
  * Created by Skinner on 2/5/17.
  */
 
 public class InventoryCursorAdapter extends CursorAdapter {
+
+    public static String TAG = InventoryCursorAdapter.class.getSimpleName();
 
     public InventoryCursorAdapter(Context context, Cursor c) { super(context, c, 0); }
 
@@ -33,35 +32,47 @@ public class InventoryCursorAdapter extends CursorAdapter {
     }
 
     /**
-     * Is this the proper way to implement the ViewHolder Patter with Butterknife?
+     * I was not able to implement the viewholder pattern with butterknife, is there
+     * a special way to do it with Butterknife?
      *
      * Are there any resources for using the recyclerview with a cursoradapter?
      *
      * What are the options for setting up the click listener for the sale button;
-     * in the adapter vs. the activity
+     * in the adapter vs. the activity?
+     *
+     *
      */
     @Override
     public void bindView(View view, Context context, final Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+
+        TextView itemNameView = (TextView) view.findViewById(R.id.item_name);
+        TextView supplierNameView = (TextView) view.findViewById(R.id.supplier_name);
+        TextView stockView = (TextView) view.findViewById(R.id.stock);
+        TextView priceView = (TextView) view.findViewById(R.id.price);
+        Button saleButtonView = (Button) view.findViewById(R.id.sale_button);
+
 
         int itemNameIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_NAME);
         int supplierNameIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_SUPPLIER_NAME);
         int itemStockIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_STOCK);
+        int priceIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
         int itemId = cursor.getColumnIndex(InventoryEntry._ID);
 
         final Integer id = cursor.getInt(itemId);
         String itemName = cursor.getString(itemNameIndex);
         String supplierName = cursor.getString(supplierNameIndex);
+        Double itemPrice = cursor.getDouble(priceIndex);
         final Integer itemStock = cursor.getInt(itemStockIndex);
 
-        viewHolder.itemNameView.setText(itemName);
-        viewHolder.supplierNameView.setText(supplierName);
-        viewHolder.stockView.setText(Integer.toString(itemStock));
+        itemNameView.setText(itemName);
+        supplierNameView.setText(supplierName);
+        priceView.setText(Double.toString(itemPrice));
+        stockView.setText(Integer.toString(itemStock));
 
-        viewHolder.saleButtonView.setOnClickListener(new View.OnClickListener() {
+        saleButtonView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (itemStock <= 0) {
+                if (itemStock < 1) {
                     return;
                 }
 
@@ -72,16 +83,5 @@ public class InventoryCursorAdapter extends CursorAdapter {
                 view.getContext().getContentResolver().update(uri, values, null, null);
             }
         });
-    }
-
-    static class ViewHolder {
-        @BindView(R.id.item_name) TextView itemNameView;
-        @BindView(R.id.supplier_name) TextView supplierNameView;
-        @BindView(R.id.stock) TextView stockView;
-        @BindView(R.id.sale_button) Button saleButtonView;
-
-        public ViewHolder(View view)  {
-            ButterKnife.bind(this, view);
-        }
     }
 }

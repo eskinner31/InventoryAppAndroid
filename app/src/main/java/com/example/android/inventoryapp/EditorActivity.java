@@ -1,16 +1,19 @@
 package com.example.android.inventoryapp;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MotionEvent;
@@ -24,10 +27,6 @@ import com.example.android.inventoryapp.data.InventoryContract.InventoryEntry;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,16 +38,15 @@ import butterknife.ButterKnife;
 public class EditorActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    //TODO Validation
-    //TODO CHECKS FOR COMPLETION
-
     //Constants
     public static final String TAG = EditorActivity.class.getSimpleName();
     public static final int INVENTORY_LOADER = 0;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     //Variables
     private Uri mCurrentItemUri;
     private boolean mItemHasChanged;
+    private Bitmap mImageStorage;
 
     //Listeners
     private View.OnTouchListener mTouchListner = new View.OnTouchListener() {
@@ -70,9 +68,7 @@ public class EditorActivity extends AppCompatActivity implements
     @BindView(R.id.supplier_name_edittext) EditText mSupplierNameEditText;
     @BindView(R.id.item_name_edittext) EditText mItemNameEditText;
     @BindView(R.id.item_image_view) ImageView mItemImageView;
-    @BindView(R.id.image_link_edittext) EditText mImageLinkView;
-
-    //TODO: ALL OF YOUR VALIDATION AND WORK/CHECKS WILL BE DONE HERE.
+    @BindView(R.id.image_button) Button mImageButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,7 +98,7 @@ public class EditorActivity extends AppCompatActivity implements
         mDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteItem();
+                deleteDialog();
             }
         });
 
@@ -117,6 +113,13 @@ public class EditorActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 orderReceived();
+            }
+        });
+
+        mImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispathTakePictureIntent();
             }
         });
 
@@ -175,6 +178,7 @@ public class EditorActivity extends AppCompatActivity implements
             ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBlob);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             mItemImageView.setImageBitmap(bitmap);
+            mImageStorage = bitmap;
         }
     }
 
@@ -206,8 +210,10 @@ public class EditorActivity extends AppCompatActivity implements
 
     private void emailSupplier() {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_EMAIL, mSupplierEmailEditText.getText().toString().trim());
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[] {mSupplierEmailEditText.getText().toString().trim()});
+        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject_line));
+        intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.body));
 
         startActivity(Intent.createChooser(intent, "Send Email"));
     }
@@ -227,44 +233,91 @@ public class EditorActivity extends AppCompatActivity implements
         finish();
     }
 
-    private Bitmap selectImage(String src) {
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();;
-            InputStream input = connection.getInputStream();
-            Bitmap imageBitmap = BitmapFactory.decodeStream(input);
-            return imageBitmap;
-        } catch (IOException e){
-            e.printStackTrace();
-            return null;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mImageStorage = imageBitmap;
         }
-
     }
 
+    private void dispathTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    private void deleteDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_warning_message);
+        builder.setPositiveButton(R.string.affirmative, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteItem();
+            }
+        });
+        builder.setNegativeButton(R.string.negative, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    /**
+     *  What are better practices for checking/storing images?
+     *
+     *  Would it be better to save to sdCard vs sqLite? Or just store a uri to the file
+     *  location?
+     */
     private void saveItemDetails() {
+
+        if (mImageStorage == null) {
+            Toast.makeText(this, getString(R.string.need_image),
+                    Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
 
         String itemName = mItemNameEditText.getText().toString().trim();
         String supplierName = mSupplierNameEditText.getText().toString().trim();
         String supplierEmail = mSupplierEmailEditText.getText().toString().trim();
-        Double price = Double.parseDouble(mPriceEditText.getText().toString().trim());
-        Integer stock = Integer.parseInt(mStockEditText.getText().toString().trim());
-        Bitmap image = selectImage(mImageLinkView.getText().toString().trim());
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] compressedImage = stream.toByteArray();
+        String priceAsText = mPriceEditText.getText().toString().trim();
+        String stockAsText = mStockEditText.getText().toString().trim();
 
-
-        if (mCurrentItemUri == null && TextUtils.isEmpty(itemName) &&
-                TextUtils.isEmpty(supplierName) && TextUtils.isEmpty(supplierEmail) &&
-                price == null && stock == null) {
+        if (TextUtils.isEmpty(itemName) || TextUtils.isEmpty(supplierName) ||
+                TextUtils.isEmpty(supplierEmail) || TextUtils.isEmpty(priceAsText) ||
+                TextUtils.isEmpty(stockAsText)) {
 
             Toast.makeText(this, getString(R.string.fill_out_fields_warning),
                     Toast.LENGTH_SHORT).show();
 
             return;
         }
+
+        if (!supplierEmail.contains("@") || !supplierEmail.contains(".")) {
+            Toast.makeText(this, getString(R.string.need_valid_email), Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
+        //Converting values after verifying they are present
+        Double price = Double.parseDouble(priceAsText);
+        Integer stock = Integer.parseInt(stockAsText);
+        Bitmap image = mImageStorage;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] compressedImage = stream.toByteArray();
+
 
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_ITEM_NAME, itemName);

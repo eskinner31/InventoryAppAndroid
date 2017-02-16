@@ -181,7 +181,7 @@ public class InventoryProvider extends ContentProvider {
             case INVENTORY:
                 return updateItem(uri, contentValues, selection, selectionArgs);
             case INVENTORY_ID:
-                selection = INVENTORY_ID + "=?";
+                selection = InventoryEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 return updateItem(uri, contentValues, selection, selectionArgs);
@@ -213,15 +213,11 @@ public class InventoryProvider extends ContentProvider {
             if (supplierEmail == null) {
                 throw new IllegalArgumentException("Need email");
             }
-            if (!supplierEmail.contains("@") && !supplierEmail.contains(".")) {
-                throw new IllegalArgumentException("Not a valid email");
-            }
         }
-
 
         if (values.containsKey(InventoryEntry.COLUMN_STOCK)) {
             int quantityInStock = values.getAsInteger(InventoryEntry.COLUMN_STOCK);
-            if (quantityInStock < 1) {
+            if (quantityInStock < 0) {
                 throw new IllegalArgumentException("Need at least one unit");
             }
         }

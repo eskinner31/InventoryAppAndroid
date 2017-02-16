@@ -1,7 +1,6 @@
 package com.example.android.inventoryapp;
 
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -37,9 +36,6 @@ public class InventoryActivity extends AppCompatActivity implements
     @BindView(R.id.inventory_list_view) AdapterView mInventoryListView;
     @BindView(R.id.empty_stock) TextView mEmptyTextView;
 
-    //Listeners
-    //TODO: ATTEMPT BINDING LISTENERS WITH BUTTERKNIFE ANNOTATIONS
-
     //Adapters
     InventoryCursorAdapter mCursorAdapter;
 
@@ -66,20 +62,6 @@ public class InventoryActivity extends AppCompatActivity implements
         mInventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-
-                Log.v(TAG, view.getTag().toString());
-                Log.v(TAG, "THE VIEW" + view.toString());
-                if(view.getTag() != null) {
-                    int currentQuantity = Integer.parseInt(view.findViewById(R.id.stock_edittext).toString().trim());
-                    int newQuantity = currentQuantity - 1;
-                    Uri currentItemUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
-                    ContentValues values = new ContentValues();
-                    values.put(InventoryEntry.COLUMN_STOCK, newQuantity);
-
-                    getContentResolver().update(currentItemUri, values, null, null);
-
-                }
-
                 Intent intent = new Intent(InventoryActivity.this, EditorActivity.class);
                 Uri currentItemUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
                 intent.setData(currentItemUri);
@@ -117,7 +99,8 @@ public class InventoryActivity extends AppCompatActivity implements
                 InventoryEntry._ID,
                 InventoryEntry.COLUMN_ITEM_NAME,
                 InventoryEntry.COLUMN_SUPPLIER_NAME,
-                InventoryEntry.COLUMN_STOCK
+                InventoryEntry.COLUMN_STOCK,
+                InventoryEntry.COLUMN_PRICE
         };
 
         return new CursorLoader(this,
@@ -131,7 +114,6 @@ public class InventoryActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
         mCursorAdapter.swapCursor(data);
     }
 
@@ -143,6 +125,5 @@ public class InventoryActivity extends AppCompatActivity implements
 
     private void deleteAll() {
         int rowsDeleted = getContentResolver().delete(InventoryEntry.CONTENT_URI, null, null);
-        Log.v(TAG, rowsDeleted + " rows deleted");
     }
 }
